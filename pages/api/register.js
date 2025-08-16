@@ -9,10 +9,10 @@ export const config={
 };
 
 async function getId(res) {
-        let [[record]] = await db.query(`SELECT prefix, count, mailcount FROM countholder where id ='1' `);
-        let  {prefix,count,mailcount}= record
+        let [[record]] = await db.query(`SELECT prefix, count FROM countholder where id ='1' `);
+        let  {prefix,count}= record
         let id = prefix + String(count);
-        return {id,count,mailcount}
+        return {id,count}
 }
 
 async function getData(req,id){
@@ -62,7 +62,7 @@ async function getData(req,id){
 
 
 
-async function RegisterPlayer(id,name,college_details,events,email,phone,amount,payment,screenShot,count,mailcount) {
+async function RegisterPlayer(id,name,college_details,events,email,phone,amount,payment,screenShot,count) {
     const queries = `
     INSERT INTO players(
         id,name,college_details,
@@ -83,9 +83,9 @@ async function RegisterPlayer(id,name,college_details,events,email,phone,amount,
     export default async function Handler(req,res){
     try{
         if(req.method === 'POST'){
-        let {id,count,mailcount} = await getId(res)
+        let {id,count} = await getId(res)
         let [name,college_details,events,email,phone,amount,payment,screenShot] = await getData(req,id);
-        await RegisterPlayer(id,name,college_details,events,email,phone,amount,payment,screenShot,count,mailcount);
+        await RegisterPlayer(id,name,college_details,events,email,phone,amount,payment,screenShot,count);
         res.status(200).json({message:"Player Registered Sucessfully!\n Email sent will be sent Shortly \n [Please do check your spam folder once]"}) 
         }else{
         res.status(403).json({message:'NOT ALLOWED'})
@@ -100,6 +100,6 @@ async function RegisterPlayer(id,name,college_details,events,email,phone,amount,
         if(err.code === 'ER_USER_LIMIT_REACHED'){
             res.status(409).json({message:"Server Busy please Try again After 1 hour!"})
         }
-        res.status(500).json((err.message))
+        res.status(500).json({message:err.message})
     }
 }

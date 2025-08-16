@@ -1,109 +1,159 @@
-import {Button,Field,SystemPopup} from "./Tools";
+import { Button, Field, SystemPopup } from "./Tools";
 import styles from "@/styles/Registerform.module.css"
 import { data } from "@/pages/Data";
 import { useContext, useState } from "react";
 import { EventContext } from "@/public/conext";
-import { ShowContext,InfoContext } from "@/public/conext";
+import { ShowContext, InfoContext } from "@/public/conext";
 
-export default function RegisterForm(){
-    const {Event} = useContext(EventContext);
-    const {setshowRegister} = useContext(ShowContext);
-    const {Info,setInfo} = useContext(InfoContext)
-    const [Visibile,setVisible] = useState(false);
-    const [Localcheck,setLocalcheck] = useState(true);
-    const [Amount,setAmount] = useState(Event.amt?Number(Event.amt):0);
-    let images_set = data.map((e)=>{
-        if (Event && Event.image == e.image){
-            return <img src={e.image} alt="No Event Selected" className={styles.img + ' grayscale-0 opacity-[1]'}/>
+export default function RegisterForm() {
+    const { Event } = useContext(EventContext);
+    const { setshowRegister } = useContext(ShowContext);
+    const { Info, setInfo } = useContext(InfoContext)
+    const [Visibile, setVisible] = useState(false);
+    const [Localcheck, setLocalcheck] = useState(true);
+    const [Amount, setAmount] = useState(Event.amt ? Number(Event.amt) : 0);
+    let images_set = data.map((e) => {
+        if (Event && Event.image == e.image) {
+            return <img src={e.image} alt="No Event Selected" className={styles.img + ' grayscale-0 opacity-[1]'} />
         }
-        else{
-            return <img src={e.image} alt="No Event Selected" className={styles.img + ' grayscale-100 opacity-[0.5]'}/>
+        else {
+            return <img src={e.image} alt="No Event Selected" className={styles.img + ' grayscale-100 opacity-[0.5]'} />
         }
     })
-    const [Images,setImages] = useState(images_set)
-    let options = data.map((e,index)=>{
-        if (Event && e.title == Event.title){
+    const [Images, setImages] = useState(images_set)
+    let options = data.map((e, index) => {
+        if (Event && e.title == Event.title) {
             return (
                 <>
-                <label htmlFor={index} className="text-[15px]">{e.title}</label>
-                <input id={index} type="checkbox" className='mx-[2px]' value={[e.title,e.amt]} onChange={handleSelection} checked={Localcheck} name='events'></input>
-                <br />
+                    <label htmlFor={index} className="text-[15px]">{e.title}</label>
+                    <input id={index} type="checkbox" className='mx-[2px]' value={[e.title, e.amt]} onChange={handleSelection} checked={Localcheck} name='events'></input>
+                    <br />
                 </>
             )
         }
-        else{
-        return(
-            <>
-            <label htmlFor={index} className="text-[15px]">{e.title}</label>
-            <input id={index} type="checkbox" className='mx-[2px]' value={[e.title,e.amt]} onChange={handleSelection} name='events'></input>
-            <br />
-            </>
-        )}
+        else {
+            return (
+                <>
+                    <label htmlFor={index} className="text-[15px]">{e.title}</label>
+                    <input id={index} type="checkbox" className='mx-[2px]' value={[e.title, e.amt]} onChange={handleSelection} name='events'></input>
+                    <br />
+                </>
+            )
+        }
     })
-    
-    function handleSelection(e){
-        let amt=Number((e.currentTarget.value).split(',')[1]);
-        let updatedImages = Images.map((record,index)=>{
+
+    function handleSelection(e) {
+        let amt = Number((e.currentTarget.value).split(',')[1]);
+        let updatedImages = Images.map((record, index) => {
             let grayscale = (((record.props.className).split(' ')).slice(1))[0]; //Handles The class name string
-            if(Event && Event.title == (e.currentTarget.value.split(','))[0]){
+            if (Event && Event.title == (e.currentTarget.value.split(','))[0]) {
                 setLocalcheck(!Localcheck)
             }
-            if(index == e.currentTarget.id && grayscale == 'grayscale-100'){
+            if (index == e.currentTarget.id && grayscale == 'grayscale-100') {
                 // Checks if the current event is unchecked, if true checks it and updates the amount value. 
-                setAmount((Amount)=>Amount+amt)
-                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-0 opacity-[1]'}/>
+                setAmount((Amount) => Amount + amt)
+                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-0 opacity-[1]'} />
             }
-            if(index == e.currentTarget.id && grayscale == 'grayscale-0'){
+            if (index == e.currentTarget.id && grayscale == 'grayscale-0') {
                 // Checks if the current event is checked, if true unchecks it and updates the amount value.
-                setAmount((Amount)=>Amount-amt)
-                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-100 opacity-[0.5]'}/>
+                setAmount((Amount) => Amount - amt)
+                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-100 opacity-[0.5]'} />
             }
-            else if(grayscale == 'grayscale-0'){
+            else if (grayscale == 'grayscale-0') {
                 // Checks if the checked events have grayscale of 0, if true changes persist.
-                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-0 opacity-[1]'}/>
+                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-0 opacity-[1]'} />
             }
-            else{
-                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-100 opacity-[0.5]'}/>
+            else {
+                return <img src={record.props.src} alt="No Event Selected" className={styles.img + ' grayscale-100 opacity-[0.5]'} />
             }
         })
         setImages(updatedImages)
 
     }
 
-    function goBack(){
+    function goBack() {
         setshowRegister(false)
     }
 
-    async function handleFormSubmission(e){
+    async function handleFormSubmission(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         const events = formData.getAll('events');
         if (events.length === 0) {
-            setInfo({message: "Please select at least one event to proceed.", show: true});
+            setInfo({ message: "Please select at least one event to proceed.", show: true });
+            return;
+        }
+        const name = formData.get('name');
+        if (name.length === 0) {
+            setInfo({ message: "Please Enter the name.", show: true });
+            return;
+        }
+        const cname = formData.get('cname');
+        if (cname.length === 0) {
+            setInfo({ message: "Please Enter the college name.", show: true });
+            return;
+        }
+        const email = formData.get('email');
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            setInfo({ message: "Please Enter a valid Email", show: true });
+            return;
+        }
+        const phone = formData.get('phone');
+        const phonePattern = /^[0-9]{10}$/;
+        if (!phonePattern.test(phone)) {
+            setInfo({ message: "Please Enter the correct Phone Number.", show: true });
+            return;
+        }
+        const course = formData.get('course');
+        if (!course || course.trim === "") {
+            setInfo({ message: "Please Enter the Course.", show: true })
+            return;
+        }
+        const year = formData.get('year');
+        if (!year || isNaN(year) || year < 1 || year > 5) {
+            setInfo({ message: "Please enter a valid year (1-5).", show: true });
+            return;
+        }
+        const mode = formData.get('mode');
+        if (!mode) {
+            setInfo({ message: "Please select a mode of payment.", show: true });
+            return;
+        }
+        if (mode === "online") {
+            const file = formData.get('screenshot');
+            if (!file || file.size === 0) {
+                setInfo({ message: "Please upload a screenshot of your payment.", show: true });
+                return;
+            }
+        }
+        if (Amount <= 0) {
+            setInfo({ message: "Invalid amount. Please select events.", show: true });
             return;
         }
 
-        if(navigator.onLine){
-            const res = await fetch('api/register',{
-                method:'POST',
-                body:formData
+
+        if (navigator.onLine) {
+            const res = await fetch('api/register', {
+                method: 'POST',
+                body: formData
             })
             let msg = await res.json();
-            setInfo({message:msg.message,show:true})
-            if(res.status == 200){
+            setInfo({ message: msg.message, show: true })
+            if (res.status == 200) {
                 setshowRegister(false)
             }
         }
-        else{
-            setInfo({message:"No Internet Connection",show:true})
+        else {
+            setInfo({ message: "No Internet Connection", show: true })
         }
     }
 
-    return(
+    return (
         <form className={styles.form} method="POST" onSubmit={handleFormSubmission}>
-            { Info.show && <SystemPopup message={Info.message}/> }
+            {Info.show && <SystemPopup message={Info.message} />}
             <div className={styles.div1}>
-                <Field For="College Name" name='cname'/>
+                <Field For="College Name" name='cname' />
                 <div className={styles.div2}>
                     <div>
                         <label htmlFor="events">Select Event:</label><br />
@@ -111,41 +161,41 @@ export default function RegisterForm(){
                             {options}
                         </div>
                     </div>
-                    <div className={styles.image_div} style={{'--len':Math.ceil(Math.log2(data.length))}}>
-                            {Images}
+                    <div className={styles.image_div} style={{ '--len': Math.ceil(Math.log2(data.length)) }}>
+                        {Images}
                     </div>
                 </div>
-                <Field For="Your Name" name='name'/>
+                <Field For="Your Name" name='name' />
             </div>
             <br />
             <div className={styles.div3}>
-                <Field For="Current Year" name='year'/>
-                <Field For="Course" name='course'/>
-                <Field For="Email" name='email'/>
-                <Field For="Contact Number" name='phone'/>
+                <Field For="Current Year" name='year' />
+                <Field For="Course" name='course' />
+                <Field For="Email" name='email' />
+                <Field For="Contact Number" name='phone' />
             </div>
             <div className="flex gap-[100px]">
-            <div className={styles.div4}>
-                <label htmlFor="MOP">Mode of Payement</label>
-                <span className="text-[20px]">&#8377;{Amount}</span>
-                <input type="text" hidden value={Amount} name='amount'></input>
-                <label htmlFor="online">Online</label>
-                <input type="radio" name="mode" id="online" value="online" onChange={()=>setVisible(true)} required/>
-                <label htmlFor="offline">Offline</label>
-                <input type="radio" name="mode" id="offline" value="offline" onChange={()=>setVisible(false)} required/>  
-            </div>
-            {Visibile &&
-             <div>
-                 <img src="Characters/Igris.jpg" className="w-[120px] h-[120px] inline mt-1 mr-[10px]"></img>
-                 <label htmlFor="screenShot" className="text-yellow-200">{'>Share Payment ScreenShot Here<'}</label>
-                 <br />
-                 <input id="screenShot" type="file" className="opacity-0" accept="image/*" name='screenshot' required></input>
-             </div>
-            }
+                <div className={styles.div4}>
+                    <label htmlFor="MOP">Mode of Payement</label>
+                    <span className="text-[20px]">&#8377;{Amount}</span>
+                    <input type="text" hidden value={Amount} name='amount'></input>
+                    <label htmlFor="online">Online</label>
+                    <input type="radio" name="mode" id="online" value="online" onChange={() => setVisible(true)} required />
+                    <label htmlFor="offline">Offline</label>
+                    <input type="radio" name="mode" id="offline" value="offline" onChange={() => setVisible(false)} required />
+                </div>
+                {Visibile &&
+                    <div>
+                        <img src="Characters/Igris.jpg" className="w-[120px] h-[120px] inline mt-1 mr-[10px]"></img>
+                        <label htmlFor="screenShot" className="text-yellow-200">{'>Share Payment ScreenShot Here<'}</label>
+                        <br />
+                        <input id="screenShot" type="file" className="opacity-0" accept="image/*" name='screenshot' required></input>
+                    </div>
+                }
             </div>
             <div className="flex gap-[50px] m-0">
-            <Button onSmash={goBack}>Back</Button>
-            <Button>Submit</Button>
+                <Button onSmash={goBack}>Back</Button>
+                <Button>Submit</Button>
             </div>
         </form>
     )
